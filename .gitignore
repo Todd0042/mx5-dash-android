@@ -1,0 +1,30 @@
+# Gradle
+.gradle/
+build/
+app/build/
+build/
+captures/
+.local/
+gradle-app.setting
+*.jks
+*.keystore
+!debug.keystore
+
+# Kotlin
+.kotlin/
+
+# Android Studio / IntelliJ
+.idea/
+*.iml
+.DS_Store
+
+# Generated / local
+local.properties
+*.apk
+*.aab
+*.ap_
+*.dex
+
+# Native build
+app/.cxx/
+app/src/main/cpp/third_party/build/
