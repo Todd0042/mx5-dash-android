@@ -25,11 +25,17 @@ class Mx5RenderView @JvmOverloads constructor(
 ) : SurfaceView(context, attrs, defStyle), SurfaceHolder.Callback {
 
     companion object {
-        const val LOGICAL_W = 800
-        const val LOGICAL_H = 360
+        const val LOGICAL_W = 360
+        const val LOGICAL_H = 800
         private const val CONTENT_SCREEN_COUNT = 7 // Screens 0..6
         private const val SLIDE_DURATION_MS = 200L
         private const val MAX_HOLD_TIMEOUT_MS = 750L
+
+        // Transition Silhouette Layout (Portrait: width 360, height 800)
+        private const val CAR_W = 280f
+        private const val CAR_CENTER_X = LOGICAL_W / 2f
+        private const val CAR_CENTER_Y = 380f
+        private const val CAR_TRAVEL_DIST = (LOGICAL_W / 2f) + (CAR_W / 2f) + 30f
     }
 
     private enum class TransitionPhase {
@@ -203,14 +209,14 @@ class Mx5RenderView @JvmOverloads constructor(
                                 tempRect.set(scaleRect.left + shiftA, scaleRect.top, scaleRect.right + shiftA, scaleRect.bottom)
                                 canvas.drawBitmap(screenABitmap, null, tempRect, paint)
 
-                                // Slide Vehicle Silhouette towards center (400, 180)
+                                // Slide Vehicle Silhouette towards center
                                 val carX = if (transitionDirection == Direction.LEFT) {
-                                    (LOGICAL_W + 140f) - ((LOGICAL_W + 140f - 400f) * ease)
+                                    (CAR_CENTER_X + CAR_TRAVEL_DIST) - (CAR_TRAVEL_DIST * ease)
                                 } else {
-                                    -140f + ((400f - (-140f)) * ease)
+                                    (CAR_CENTER_X - CAR_TRAVEL_DIST) + (CAR_TRAVEL_DIST * ease)
                                 }
                                 val pulse = (sin(nowMs * 0.008) * 0.5 + 0.5).toFloat()
-                                drawMx5Silhouette(canvas, carX, 180f, transitionDirection == Direction.LEFT, pulse, getScreenTitle(targetScreenIndex))
+                                drawMx5Silhouette(canvas, carX, CAR_CENTER_Y, transitionDirection == Direction.LEFT, pulse, getScreenTitle(targetScreenIndex))
 
                                 if (progress >= 1.0f) {
                                     transitionPhase = TransitionPhase.HOLD_LOCK
@@ -221,7 +227,7 @@ class Mx5RenderView @JvmOverloads constructor(
                             TransitionPhase.HOLD_LOCK -> {
                                 // Draw centered silhouette with pulsing amber DRLs
                                 val pulse = (sin((nowMs - holdStartTimeMs) * 0.008) * 0.5 + 0.5).toFloat()
-                                drawMx5Silhouette(canvas, 400f, 180f, transitionDirection == Direction.LEFT, pulse, getScreenTitle(targetScreenIndex))
+                                drawMx5Silhouette(canvas, CAR_CENTER_X, CAR_CENTER_Y, transitionDirection == Direction.LEFT, pulse, getScreenTitle(targetScreenIndex))
 
                                 val isPayloadReady = app?.bluetoothManager?.isFreshPayloadReady == true
                                 val isTimeout = (nowMs - holdStartTimeMs) >= MAX_HOLD_TIMEOUT_MS
@@ -253,12 +259,12 @@ class Mx5RenderView @JvmOverloads constructor(
 
                                 // Accelerate Vehicle Silhouette off-screen in its facing direction
                                 val carX = if (transitionDirection == Direction.LEFT) {
-                                    400f - (540f * ease)
+                                    CAR_CENTER_X - (CAR_TRAVEL_DIST * ease)
                                 } else {
-                                    400f + (540f * ease)
+                                    CAR_CENTER_X + (CAR_TRAVEL_DIST * ease)
                                 }
                                 val pulse = (sin(nowMs * 0.008) * 0.5 + 0.5).toFloat()
-                                drawMx5Silhouette(canvas, carX, 180f, transitionDirection == Direction.LEFT, pulse, "")
+                                drawMx5Silhouette(canvas, carX, CAR_CENTER_Y, transitionDirection == Direction.LEFT, pulse, "")
 
                                 if (progress >= 1.0f) {
                                     transitionPhase = TransitionPhase.IDLE
@@ -322,35 +328,50 @@ class Mx5RenderView @JvmOverloads constructor(
         val cx = scaleRect.left + (logicalCx * scale)
         val cy = scaleRect.top + (logicalCy * scale)
 
+        val carBitmap = if (isFacingLeft) carLeftBitmap else carRightBitmap
+        val carW = CAR_W
+        val carH = if (carBitmap != null && carBitmap.width > 0) {
+            carW * carBitmap.height / carBitmap.width
+        } else {
+            carW * (122f / 354f)
+        }
+
         canvas.save()
         canvas.translate(cx, cy)
         canvas.scale(scale, scale)
 
-        val carBitmap = if (isFacingLeft) carLeftBitmap else carRightBitmap
         if (carBitmap != null) {
-            val carW = 380f
-            val carH = (carW * carBitmap.height / carBitmap.width)
             val dstLeft = -carW / 2f
             val dstTop = -carH / 2f
             tempRect.set(dstLeft, dstTop, dstLeft + carW, dstTop + carH)
             canvas.drawBitmap(carBitmap, null, tempRect, paint)
 
-            // Pulsing Headlight & Taillight Glow overlays
+            // Headlight & Taillight fixture positions relative to car center:
+            // When isFacingLeft = true: headlight on left (-X), taillight on right (+X)
+            // When isFacingLeft = false: headlight on right (+X), taillight on left (-X)
+            val headlightRelX = if (isFacingLeft) -0.416f * carW else 0.416f * carW
+            val headlightRelY = 0.156f * carH
+            val taillightRelX = if (isFacingLeft) 0.449f * carW else -0.449f * carW
+            val taillightRelY = -0.078f * carH
+
+            // Pulsing Headlight (Amber DRL) Glow overlays
             val drlAlpha = (140 + (115 * pulse)).toInt().coerceIn(0, 255)
             drlPaint.alpha = drlAlpha
             drlGlowPaint.alpha = (90 * pulse).toInt().coerceIn(0, 255)
-            // Left headlight fixture
-            canvas.drawCircle(-160f, 0f, 9f, drlGlowPaint)
-            canvas.drawCircle(-160f, 0f, 3.5f, drlPaint)
+            canvas.drawCircle(headlightRelX, headlightRelY, 8f, drlGlowPaint)
+            canvas.drawCircle(headlightRelX, headlightRelY, 3f, drlPaint)
 
-            // Right taillight fixture
+            // Pulsing Taillight (Soul Red) Glow overlays
             val tailAlpha = (160 + (95 * pulse)).toInt().coerceIn(0, 255)
             tailPaint.alpha = tailAlpha
             tailGlowPaint.alpha = (95 * pulse).toInt().coerceIn(0, 255)
-            canvas.drawCircle(160f, -6f, 8f, tailGlowPaint)
-            canvas.drawCircle(160f, -6f, 3f, tailPaint)
+            canvas.drawCircle(taillightRelX, taillightRelY, 7f, tailGlowPaint)
+            canvas.drawCircle(taillightRelX, taillightRelY, 2.5f, tailPaint)
         } else {
             // Fallback Vector Rendering if bitmap not loaded
+            if (!isFacingLeft) {
+                canvas.scale(-1f, 1f)
+            }
             val bodyPath = Path().apply {
                 moveTo(-110f, 20f)
                 lineTo(-106f, 10f)
@@ -411,12 +432,14 @@ class Mx5RenderView @JvmOverloads constructor(
         if (screenTitle.isNotEmpty()) {
             val titleAlpha = (170 + (85 * pulse)).toInt().coerceIn(0, 255)
             textPaint.alpha = titleAlpha
-            canvas.drawText(screenTitle, cx, cy + (76f * scale), textPaint)
+            val titleY = cy + ((carH / 2f) + 26f) * scale
+            canvas.drawText(screenTitle, cx, titleY, textPaint)
 
             dotPaint.alpha = titleAlpha
             val titleHalfW = (textPaint.measureText(screenTitle) / 2f)
-            canvas.drawCircle(cx - titleHalfW - (14f * scale), cy + (72f * scale), 3.5f * scale, dotPaint)
-            canvas.drawCircle(cx + titleHalfW + (14f * scale), cy + (72f * scale), 3.5f * scale, dotPaint)
+            val dotY = titleY - (4f * scale)
+            canvas.drawCircle(cx - titleHalfW - (14f * scale), dotY, 3.5f * scale, dotPaint)
+            canvas.drawCircle(cx + titleHalfW + (14f * scale), dotY, 3.5f * scale, dotPaint)
         }
     }
 

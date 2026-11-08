@@ -8,9 +8,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_SHARED_LINKER_FLAGS
     "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-z,max-page-size=16384 -Wl,-z,common-page-size=16384")
 
-get_filename_component(REPO_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../../../../.." ABSOLUTE)
-get_filename_component(MX5_UI "${REPO_ROOT}/lib/mx5_ui" ABSOLUTE)
-get_filename_component(MX5_CONFIG "${REPO_ROOT}/lib/mx5_config" ABSOLUTE)
+get_filename_component(REPO_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../../../../" ABSOLUTE)
+get_filename_component(MX5_UI "${REPO_ROOT}/app/src/main/cpp/shared/mx5_ui" ABSOLUTE)
+get_filename_component(MX5_CONFIG "${REPO_ROOT}/app/src/main/cpp/shared/mx5_config" ABSOLUTE)
 
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}

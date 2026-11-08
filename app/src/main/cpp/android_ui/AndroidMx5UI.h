@@ -15,8 +15,8 @@
 
 class AndroidMx5UI {
 public:
-    static constexpr uint16_t WIDTH = 800;
-    static constexpr uint16_t HEIGHT = 360;
+    static constexpr uint16_t WIDTH = 360;
+    static constexpr uint16_t HEIGHT = 800;
 
     static constexpr uint8_t SCREEN_SPEED = 0;
     static constexpr uint8_t SCREEN_TPMS  = 1;

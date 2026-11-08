@@ -80,6 +80,28 @@ class BluetoothService : Service() {
         super.onDestroy()
     }
 
+    override fun onTaskRemoved(rootIntent: Intent?) {
+        super.onTaskRemoved(rootIntent)
+        android.util.Log.i("BluetoothService", "onTaskRemoved: app task dismissed from Recents, terminating process")
+
+        val app = application as? Mx5Application
+        app?.bluetoothManager?.removeConnectionListener(connectionListener)
+        app?.bluetoothManager?.stop()
+        app?.telemetrySimulator?.stop()
+
+        wakeLock?.let {
+            if (it.isHeld) it.release()
+        }
+        wakeLock = null
+
+        ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
+        stopSelf()
+
+        // Terminate app process completely
+        android.os.Process.killProcess(android.os.Process.myPid())
+        kotlin.system.exitProcess(0)
+    }
+
     override fun onBind(intent: Intent?): IBinder? = null
 
     private fun createNotificationChannel() {
