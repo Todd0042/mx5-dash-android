@@ -9,7 +9,7 @@
 # 📱 MX-5 Dash Android: Companion Telemetry App
 
 [![Version](https://img.shields.io/badge/Version-2.4.0-ff2a85.svg)](https://github.com/Todd0042/mx5-dash-android/releases)
-[![License: MIT](https://img.shields.io/badge/License-MIT-purple.svg)](LICENSE)
+[![License: PolyForm Noncommercial 1.0.0](https://img.shields.io/badge/License-PolyForm%20Noncommercial%201.0.0-00f0ff.svg)](LICENSE)
 [![Platform: Android 8.0+](https://img.shields.io/badge/Platform-Android%208.0%2B%20(API%2026%2B)-3DDC84.svg?logo=android&logoColor=white)](https://developer.android.com)
 [![Engine: C++17 & LVGL 9.2.0](https://img.shields.io/badge/Engine-C%2B%2B17%20%26%20LVGL%209.2.0-blue.svg)](app/src/main/cpp/CMakeLists.txt)
 [![Hardware Link](https://img.shields.io/badge/Hardware-ESP32--S3%20Companion-orange.svg)](https://github.com/Todd0042/mx5-dash)
@@ -314,7 +314,7 @@ mx5-dash-android/
 ├── settings.gradle.kts                          # Root project name ("OBD2Android") & :app module
 ├── gradle.properties                            # JVM args, AndroidX, non-transitive R class
 ├── gradle/wrapper/gradle-wrapper.properties     # Gradle 8.14 distribution config
-├── LICENSE                                      # MIT License
+├── LICENSE                                      # PolyForm Noncommercial License 1.0.0 (Copyright (c) 2026 Todd0042)
 ├── NOTES.md                                     # Architecture & post-split handoff notes
 └── app/
     ├── build.gradle.kts                         # SDK 35/34/26, NDK 27.2.12479018, ABIs (arm64-v8a, x86_64), CMake 3.22.1
@@ -370,10 +370,10 @@ mx5-dash-android/
 
 ## 9. License & Support
 
-Licensed under the **MIT License** — see [LICENSE](LICENSE) for full terms.
+Licensed under the [PolyForm Noncommercial License 1.0.0](LICENSE) — free for personal, hobby, educational, research and nonprofit use; commercial use (inside a company, in a paid product or service, or for profit) requires a separate license from [Todd0042](https://github.com/Todd0042).
 
 <p align="center">
-  If you enjoy driving with MX-5 Dash Android, consider supporting open-source development:<br/><br/>
+  If you enjoy driving with MX-5 Dash Android, consider supporting its development:<br/><br/>
   <a href="https://ko-fi.com/todd0042" target="_blank">
     <img src="https://img.shields.io/badge/☕_Support_MX--5_Dash_on_Ko--fi-F16061?style=for-the-badge&logo=ko-fi&logoColor=white" alt="Support on Ko-fi">
   </a>
