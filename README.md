@@ -372,6 +372,8 @@ mx5-dash-android/
 
 Licensed under the [PolyForm Noncommercial License 1.0.0](LICENSE) — free for personal, hobby, educational, research and nonprofit use; commercial use (inside a company, in a paid product or service, or for profit) requires a separate license from [Todd0042](https://github.com/Todd0042).
 
+**Media License**: the images, artwork and audio made for this project (paths listed in [LICENSE-MEDIA](LICENSE-MEDIA)) are © Todd0042 under **[CC BY-NC 4.0](LICENSE-MEDIA)**: free to share and adapt with credit for non-commercial purposes; commercial use requires permission.
+
 <p align="center">
   If you enjoy driving with MX-5 Dash Android, consider supporting its development:<br/><br/>
   <a href="https://ko-fi.com/todd0042" target="_blank">
